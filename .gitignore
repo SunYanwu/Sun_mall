@@ -9,6 +9,7 @@
 /${logger.path}/
 /.vscode
 /target
+/out
 /output
 *.iml
 *.ipr
