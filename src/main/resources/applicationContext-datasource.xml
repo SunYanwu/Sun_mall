@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xsi:schemaLocation=" http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+    <context:component-scan annotation-config="true" base-package="com.sunmall"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" id="propertyConfigurer">
+        <property value="2" name="order"/>
+        <property value="true" name="ignoreUnresolvablePlaceholders"/>
+        <property name="locations">
+            <list>
+                <value>classpath:db.properties</value>
+            </list>
+        </property>
+        <property value="utf-8" name="fileEncoding"/>
+    </bean>
+    <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource" destroy-method="close">
+        <property value="${db.driverClassName}" name="driverClassName"/>
+        <property value="${db.url}" name="url"/>
+        <property value="${db.username}" name="username"/>
+        <property value="${db.password}" name="password"/>
+        <!-- 连接池启动时的初始值 -->
+        <property value="${db.initialSize}" name="initialSize"/>
+        <!-- 连接池的最大值 -->
+        <property value="${db.maxActive}" name="maxActive"/>
+        <!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 -->
+        <property value="${db.maxIdle}" name="maxIdle"/>
+        <!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请 -->
+        <property value="${db.minIdle}" name="minIdle"/>
+        <!-- 最大建立连接等待时间。如果超过此时间将接到异常。设为－1表示无限制 -->
+        <property value="${db.maxWait}" name="maxWait"/>
+        <!--#给出一条简单的sql语句进行验证 -->
+        <!--<property name="validationQuery" value="select getdate()" />-->
+        <property value="${db.defaultAutoCommit}" name="defaultAutoCommit"/>
+        <!-- 回收被遗弃的（一般是忘了释放的）数据库连接到连接池中 -->
+        <!--<property name="removeAbandoned" value="true" />-->
+        <!-- 数据库连接过多长时间不用将被视为被遗弃而收回连接池中 -->
+        <!--<property name="removeAbandonedTimeout" value="120" />-->
+        <!-- #连接的超时时间，默认为半小时。 -->
+        <property value="${db.minEvictableIdleTimeMillis}" name="minEvictableIdleTimeMillis"/>
+        <!--# 失效检查线程运行时间间隔，要小于MySQL默认-->
+        <property value="40000" name="timeBetweenEvictionRunsMillis"/>
+        <!--# 检查连接是否有效-->
+        <property value="true" name="testWhileIdle"/>
+        <!--# 检查连接有效性的SQL语句-->
+        <property value="SELECT 1 FROM dual" name="validationQuery"/>
+    </bean>
+    <!--配置会话工厂-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property value="classpath*:mappers/*Mapper.xml" name="mapperLocations"/>
+        <!-- 分页插件 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageHelper">
+                    <property name="properties">
+                        <value> dialect=mysql </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" name="mapperScannerConfigurer">
+        <property value="com.sunmall.dao" name="basePackage"/>
+    </bean>
+    <!-- 使用@Transactional进行声明式事务管理需要声明下面这行 -->
+    <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
+    <!-- 事务管理 -->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property value="true" name="rollbackOnCommitFailure"/>
+    </bean>
+</beans>
