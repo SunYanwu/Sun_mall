@@ -151,4 +151,14 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="checkUsername" parameterType="String" resultType="int">
+    select count(1) from mmall_user where username=#{username};
+  </select>
+
+   <select id="selectLogin" parameterType="map" resultType="com.sunmall.pojo.User">
+       selcet <include refid="Base_Column_List"/> where username=#{username} and password=#{password};
+   </select>
+   <select id="checkEmail" parameterType="String" resultType="int">
+     select count(1) from mmall_user where email=#{emailName};
+   </select>
 </mapper>

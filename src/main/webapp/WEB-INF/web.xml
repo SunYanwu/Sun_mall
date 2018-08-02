@@ -30,18 +30,18 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns="http://java.sun.com/xm
   </listener>
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value> classpath:applicationContext.xml </param-value>
+    <param-value> classpath:applicationContext.xml</param-value>
   </context-param>
   <!--SpringMVC的加载和拦截配置-->
   <servlet>
     <servlet-name>dispatcher</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <!--加载SpringMVC的核心配置文件-->
+      <!--加载SpringMVC的核心配置文件-->
     <init-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>WEB-INF/dispather-servlet.xml</param-value>
     </init-param>
-    <!--大于0表示容器在启动时就会初始化这个Servlet，小于0表示只有在使用dispather时才进行初始化-->
+      <!--大于0表示容器在启动时就会初始化这个Servlet，小于0表示只有在使用dispather时才进行初始化-->
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
